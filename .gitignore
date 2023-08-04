@@ -1,5 +1,6 @@
 # My files
 secrets.ini
+client_secret_desktop.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

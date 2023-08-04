@@ -1,19 +1,22 @@
 import json
 import pprint
+import requests
 
 from configparser import ConfigParser
 from datetime import datetime
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from urllib import parse, request, error
-
 from weather_codes import weather_codes
+
 
 
 class ShouldIWearASweatshirtApp(App):
     def build(self):
         return MyBoxLayout()
 
+
+    # Weather API methods
     def get_current_weather(self):
         def get_api_key():
             config = ConfigParser()
@@ -100,9 +103,6 @@ class ShouldIWearASweatshirtApp(App):
         self.root.ids.choice_label.text = f'Wybrano: {choice}\nKod: {choice_code}'
         print(choice, choice_code)
 
-    def get_choice(self):
-        return self.root.ids.choice_label.text
-
     def convert_choice_str_to_code(self, choice: str):
         if 'bluza i kurtka' in choice:
             return 2
@@ -111,18 +111,18 @@ class ShouldIWearASweatshirtApp(App):
         elif 'bez bluzy' in choice:
             return 0
 
+    def get_choice(self):
+        return self.root.ids.choice_label.text
+
     def send_data(self):
         weather_data = self.get_current_weather()
         choice_code = self.convert_choice_str_to_code(self.get_choice())
 
-
         print(weather_data)
         print(choice_code)
 
-
-
-
-
+        with open('data.txt', 'a+') as file:
+            file.write(f'{weather_data}, {choice_code}\n')
 
 
 class MyBoxLayout(BoxLayout):
