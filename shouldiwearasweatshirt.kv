@@ -1,0 +1,89 @@
+#:import hex kivy.utils.get_color_from_hex
+
+<MyBoxLayout>:
+    orientation: 'vertical'
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '48dp'
+        canvas.before:
+            Color:
+                rgba: hex('#edd224')
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: 'Should I wear a sweatshirt?'
+            color: hex('#000000')
+            bold: True
+            font_size: '18sp'
+            size_hint_x: 0.8
+
+    TextInput:
+        id: city_input
+        text: 'Kraków'
+        size_hint_y: None
+        height: '48dp'
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        ToggleButton:
+            id: without_sweatshirt_btn
+            text: 'bez bluzy'
+            group: 'weather_options'
+            on_release: app.update_choice_label(self.text)
+
+        ToggleButton:
+            id: with_sweatshirt_btn
+            text: 'bluza lub kurtka'
+            group: 'weather_options'
+            on_release: app.update_choice_label(self.text)
+
+        ToggleButton:
+            id: with_sweatshirt_and_jacket_btn
+            text: 'bluza i kurtka'
+            group: 'weather_options'
+            on_release: app.update_choice_label(self.text)
+
+    BoxLayout:
+        orientation: 'horizontal'
+        height: '48dp'
+
+        ScrollView:
+            GridLayout:
+                cols: 1  # Ustawiamy liczbę kolumn na 1, aby zawartość mogła być przewijana w poziomie
+                size_hint_y: None
+                height: self.minimum_height
+
+
+                Label:
+                    id: data_label
+                    height: self.texture_size[1]
+                    size_hint_y: None
+                    multiline: True
+                    text_size: (self.width, None)
+
+        Button:
+            id: get_data_btn
+            text: 'Pobierz\ndane\npogodowe'
+            size_hint_x: 0.3
+            on_release: app.get_current_weather()
+
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        Label:
+            id: choice_label
+            text: 'Wybrano: '
+            size_hint_x: 0.7
+            width: '80dp'
+
+        Button:
+            id: send_btn
+            text: 'Wyślij'
+            size_hint_x: 0.3
+            on_release: app.send_data()
