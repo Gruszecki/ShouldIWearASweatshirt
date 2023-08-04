@@ -2,10 +2,12 @@ import json
 import pprint
 
 from configparser import ConfigParser
+from datetime import datetime
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from urllib import parse, request, error
 
+from weather_codes import weather_codes
 
 
 class ShouldIWearASweatshirtApp(App):
@@ -46,16 +48,80 @@ class ShouldIWearASweatshirtApp(App):
         except json.JSONDecodeError:
             weather_data = 'Cannot parse server response.'
 
-        self.root.ids.data_label.text = pprint.pformat(weather_data, indent=4, sort_dicts=False)
-        return weather_data
+        if type(weather_data) == dict:
+            weather_code = weather_data['weather'][0]['id']
+            temp = weather_data['main']['temp']
+            feels_like = weather_data['main']['feels_like']
+            temp_min = weather_data['main']['temp_min']
+            temp_max = weather_data['main']['temp_max']
+            pressure = weather_data['main']['pressure']
+            humidity = weather_data['main']['humidity']
+            visibility = weather_data['visibility']
+            wind_speed = weather_data['wind']['speed']
+            wind_deg = weather_data['wind']['deg']
+            clouds = weather_data['clouds']['all']
+            day_of_year = datetime.now().timetuple().tm_yday
+            seconds_since_midnight = (datetime.now() - datetime.now().replace(hour=0, minute=0, second=0,
+                                                                              microsecond=0)).total_seconds()
 
+            output_text = ''
+            output_text = output_text + (f'weather_code: {weather_code} {weather_codes[str(weather_code)]}\n')
+            output_text = output_text + (f'temp: {temp}\n')
+            output_text = output_text + (f'feels_like: {feels_like}\n')
+            output_text = output_text + (f'temp_min: {temp_min}\n')
+            output_text = output_text + (f'temp_max: {temp_max}\n')
+            output_text = output_text + (f'pressure: {pressure}\n')
+            output_text = output_text + (f'humidity: {humidity}\n')
+            output_text = output_text + (f'visibility: {visibility}\n')
+            output_text = output_text + (f'wind_speed: {wind_speed}\n')
+            output_text = output_text + (f'wind_deg: {wind_deg}\n')
+            output_text = output_text + (f'clouds: {clouds}\n')
+            output_text = output_text + (f'day_of_year: {day_of_year}\n')
+            output_text = output_text + (f'seconds_since_midnight: {seconds_since_midnight}')
+
+            self.root.ids.data_label.text = output_text
+
+            return [weather_code,
+                    temp,
+                    feels_like,
+                    temp_min,
+                    temp_max,
+                    pressure,
+                    humidity,
+                    visibility,
+                    wind_speed,
+                    wind_deg,
+                    clouds,
+                    day_of_year,
+                    seconds_since_midnight]
 
     def update_choice_label(self, choice):
-        self.root.ids.choice_label.text = 'Wybrano: ' + choice
+        choice_code = self.convert_choice_str_to_code(choice)
+        self.root.ids.choice_label.text = f'Wybrano: {choice}\nKod: {choice_code}'
+        print(choice, choice_code)
+
+    def get_choice(self):
+        return self.root.ids.choice_label.text
+
+    def convert_choice_str_to_code(self, choice: str):
+        if 'bluza i kurtka' in choice:
+            return 2
+        elif 'bluza lub kurtka' in choice:
+            return 1
+        elif 'bez bluzy' in choice:
+            return 0
 
     def send_data(self):
         weather_data = self.get_current_weather()
-        pprint.pp(weather_data)
+        choice_code = self.convert_choice_str_to_code(self.get_choice())
+
+
+        print(weather_data)
+        print(choice_code)
+
+
+
+
 
 
 

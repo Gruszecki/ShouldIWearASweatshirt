@@ -1,0 +1,49 @@
+Grupa kodów pogody "Clear" (bezchmurnie):
+    800: Bezchmurne niebo.
+Grupa kodów pogody "Clouds" (zachmurzenie):
+    801: Lekkie zachmurzenie: 1-25% zachmurzenia.
+    802: Rozproszone chmury: 25-50% zachmurzenia.
+    803: Zachmurzenie umiarkowane: 50-85% zachmurzenia.
+    804: Zachmurzenie całkowite: 85-100% zachmurzenia.
+Grupa kodów pogody "Rain" (deszcz):
+    500: Niewielki deszcz.
+    501: Umiarkowany deszcz.
+    502: Intensywny deszcz.
+    503: Mocny deszcz.
+    504: Ekstremalny deszcz.
+Grupa kodów pogody "Drizzle" (mżawka):
+    300: Lekka mżawka.
+    301: Intensywna mżawka.
+Grupa kodów pogody "Thunderstorm" (burza):
+    200: Lekka burza z piorunami.
+    201: Burza z piorunami.
+    202: Ciężka burza z piorunami.
+    210: Lekka burza.
+    211: Burza.
+    212: Ciężka burza.
+    221: Burza (bez piorunów).
+    230: Lekka burza z lekką mżawką.
+    231: Lekka burza z mżawką.
+    232: Lekka burza z intensywną mżawką.
+Grupa kodów pogody "Snow" (śnieg):
+    600: Niewielki śnieg.
+    601: Umiarkowany śnieg.
+    602: Intensywny śnieg.
+Grupa kodów pogody "Mist" (mgła):
+    701: Mgła.
+Grupa kodów pogody "Fog" (mgła gęsta):
+    741: Gęsta mgła.
+Grupa kodów pogody "Smoke" (dym):
+    711: Dym.
+Grupa kodów pogody "Haze" (mgła lekka):
+    721: Lekka mgiełka.
+Grupa kodów pogody "Dust" (pył):
+    731: Piasek/pył wirujący w powietrzu.
+Grupa kodów pogody "Sand" (piasek):
+    751: Piasek.
+Grupa kodów pogody "Ash" (popiół wulkaniczny):
+    761: Popiół wulkaniczny.
+Grupa kodów pogody "Squall" (szkwał):
+    771: Szkwał.
+Grupa kodów pogody "Tornado" (tornado):
+    781: Tornado.
