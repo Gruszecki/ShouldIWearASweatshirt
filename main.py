@@ -1,22 +1,81 @@
+import io
 import json
 import os
 import pprint
-import pyperclip
 
 from configparser import ConfigParser
 from datetime import datetime
+from google.auth.transport.requests import AuthorizedSession
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaIoBaseUpload
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from urllib import parse, request, error
 
 from weather_codes import weather_codes
 
+SCOPES = ['https://www.googleapis.com/auth/drive']
 
 
 class ShouldIWearASweatshirtApp(App):
     def build(self):
         return MyBoxLayout()
-        
+
+    # Google Drive API methods
+    def authorize(self):
+        creds = None
+
+        if os.path.exists('token.json'):
+            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'client_secret_pc.json', SCOPES)
+                creds = flow.run_local_server(port=0)
+            with open('token.json', 'w') as token:
+                token.write(creds.to_json())
+
+        return creds
+
+    def get_file_from_drive(self, new_content: str):
+        FILE_ID = '1VjqOnJUztDhgMWtfT9Bq3hhhqvK75ay-'
+        creds = self.authorize()
+        try:
+            drive_service = build('drive', 'v3', credentials=creds)
+
+            # Pobierz aktualną zawartość pliku
+            file = drive_service.files().get_media(fileId=FILE_ID).execute()
+
+            # Dekoduj aktualną zawartość jako tekst
+            current_content = file.decode('utf-8')
+
+            # Dodaj nową zawartość do aktualnej zawartości
+            updated_content = current_content + new_content
+
+            temp_file_content = updated_content.encode('utf-8')
+            temp_file = io.BytesIO(temp_file_content)
+
+            # Przesyłamy nową zawartość jako plik
+            media = MediaIoBaseUpload(temp_file, mimetype='text/plain')
+
+            # Aktualizujemy zawartość pliku
+            response = drive_service.files().update(
+                fileId=FILE_ID,
+                media_body=media
+            ).execute()
+
+            print('Plik został zaktualizowany.')
+
+        except Exception as e:
+            print(e)
+
     # Weather API methods
     def get_current_weather(self):
         def get_api_key():
@@ -118,10 +177,8 @@ class ShouldIWearASweatshirtApp(App):
         weather_data = self.get_current_weather()
         choice_code = self.convert_choice_str_to_code(self.get_choice())
 
-        # print(weather_data)
-        # print(choice_code)
-        text_to_copy = f'{weather_data}, {choice_code}\n'
-        pyperclip.copy(text_to_copy)
+        text_to_save = f'{weather_data}, {choice_code}\n'
+        self.get_file_from_drive(text_to_save)
 
 
 class MyBoxLayout(BoxLayout):
