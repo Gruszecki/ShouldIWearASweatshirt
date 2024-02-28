@@ -1,80 +1,38 @@
-import io
 import json
-import os
-import pprint
 
+import gspread
 from configparser import ConfigParser
 from datetime import datetime
-from google.auth.transport.requests import AuthorizedSession
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaIoBaseUpload
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from oauth2client.service_account import ServiceAccountCredentials
 from urllib import parse, request, error
 
 from weather_codes import weather_codes
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
 
 
 class ShouldIWearASweatshirtApp(App):
     def build(self):
         return MyBoxLayout()
 
-    # Google Drive API methods
-    def authorize(self):
-        creds = None
-
-        if os.path.exists('token.json'):
-            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'client_secret_pc.json', SCOPES)
-                creds = flow.run_local_server(port=0)
-            with open('token.json', 'w') as token:
-                token.write(creds.to_json())
-
-        return creds
-
-    def get_file_from_drive(self, new_content: str):
-        FILE_ID = '1VjqOnJUztDhgMWtfT9Bq3hhhqvK75ay-'
-        creds = self.authorize()
+    def send_to_drive(self, new_content: str):
         try:
-            drive_service = build('drive', 'v3', credentials=creds)
+            credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 
-            # Pobierz aktualną zawartość pliku
-            file = drive_service.files().get_media(fileId=FILE_ID).execute()
+            gc = gspread.authorize(credentials)
 
-            # Dekoduj aktualną zawartość jako tekst
-            current_content = file.decode('utf-8')
+            # Otwórz arkusz Google za pomocą jego nazwy
+            wks = gc.open("shouldiwear_data").sheet1
 
-            # Dodaj nową zawartość do aktualnej zawartości
-            updated_content = current_content + new_content
+            # Zaktualizuj arkusz danymi
+            data = ["Hello", "World"]
+            wks.append_row(data)
 
-            temp_file_content = updated_content.encode('utf-8')
-            temp_file = io.BytesIO(temp_file_content)
-
-            # Przesyłamy nową zawartość jako plik
-            media = MediaIoBaseUpload(temp_file, mimetype='text/plain')
-
-            # Aktualizujemy zawartość pliku
-            response = drive_service.files().update(
-                fileId=FILE_ID,
-                media_body=media
-            ).execute()
-
-            print('Plik został zaktualizowany.')
-
-        except Exception as e:
-            print(e)
+        except Exception as ex:
+            print(ex)
 
     # Weather API methods
     def get_current_weather(self):
@@ -178,7 +136,7 @@ class ShouldIWearASweatshirtApp(App):
         choice_code = self.convert_choice_str_to_code(self.get_choice())
 
         text_to_save = f'{weather_data}, {choice_code}\n'
-        self.get_file_from_drive(text_to_save)
+        self.send_to_drive(text_to_save)
 
 
 class MyBoxLayout(BoxLayout):
