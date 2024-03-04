@@ -5,7 +5,6 @@ from configparser import ConfigParser
 from datetime import datetime
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from oauth2client.service_account import ServiceAccountCredentials
 from urllib import parse, request, error
 
 from weather_codes import weather_codes
