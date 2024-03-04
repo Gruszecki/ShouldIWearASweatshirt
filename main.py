@@ -18,18 +18,11 @@ class ShouldIWearASweatshirtApp(App):
     def build(self):
         return MyBoxLayout()
 
-    def send_to_drive(self, new_content: str):
+    def send_to_drive(self, content: str):
         try:
-            credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-
-            gc = gspread.authorize(credentials)
-
-            # Otwórz arkusz Google za pomocą jego nazwy
+            gc = gspread.service_account(filename='client_secret.json')
             wks = gc.open("shouldiwear_data").sheet1
-
-            # Zaktualizuj arkusz danymi
-            data = ["Hello", "World"]
-            wks.append_row(data)
+            wks.append_row(content.split(','))
 
         except Exception as ex:
             print(ex)
@@ -135,7 +128,9 @@ class ShouldIWearASweatshirtApp(App):
         weather_data = self.get_current_weather()
         choice_code = self.convert_choice_str_to_code(self.get_choice())
 
-        text_to_save = f'{weather_data}, {choice_code}\n'
+        text_to_save = f'{", ".join(str(x) for x in weather_data)}, {choice_code}'
+
+        print(text_to_save)
         self.send_to_drive(text_to_save)
 
 
