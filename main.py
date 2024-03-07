@@ -1,6 +1,7 @@
 import json
 
 import gspread
+import requests
 from configparser import ConfigParser
 from datetime import datetime
 from kivy.app import App
@@ -8,9 +9,6 @@ from kivy.uix.boxlayout import BoxLayout
 from urllib import parse, request, error
 
 from weather_codes import weather_codes
-
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
 
 
 class ShouldIWearASweatshirtApp(App):
@@ -47,9 +45,8 @@ class ShouldIWearASweatshirtApp(App):
         weather_data = ''
 
         try:
-            response = request.urlopen(query)
-            data = response.read()
-            weather_data = json.loads(data)
+            response = request.get(query)
+            weather_data = response.json()
 
         except error.HTTPError as http_error:
             match http_error.code:
